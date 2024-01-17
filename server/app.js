@@ -7,7 +7,7 @@ const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/osuAuthTest");
+mongoose.connect("mongodb://localhost:27017/osuProfileRatings");
 const db = mongoose.connection;
 
 app.use(
@@ -102,9 +102,17 @@ app.get("/api/profile", async (req, res) => {
             //     console.log("User " + req.body.username + " created");
             // });'
             fetchUserStats(id).then((user) => {
+                
+                if(user.error === null) {
+                    return res.json({success: false, message: "Error getting user data. Please try again later. (User is likely banned)"});
+                }
                 createNewUser(id, user.username, false).then(() => {
                     console.log("User " + user.username + " created");
-                });
+                })
+                .catch((err) => {
+                    // console.log("Error creating new user", err);
+                    
+                })
             });
         } else {
             res.json({

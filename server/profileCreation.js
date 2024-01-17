@@ -20,7 +20,7 @@ module.exports.createNewUser = async (userId, username, registered = true) => {
 
     }
     catch(e) {
-        console.log("Error saving profile", e);
+        console.log(e)
     }
 };
 

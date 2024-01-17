@@ -24,9 +24,17 @@ module.exports.authenticate = async (code) => {
 module.exports.fetchUserStats = async(id) => {
     // console.log(id)
     await auth.login(client.id, client.secret, ["public"])
-    const user = await v2.user.details(id, "osu", "id")
+
+    try {
+        const user = await v2.user.details(id, "osu", "id")
+        return user;
+
+    }
+    catch(e) {
+        console.log("Error fetching user stats", e);
+        return null;
+    }
     // console.log(user)
-    return user;
 }
 
 
