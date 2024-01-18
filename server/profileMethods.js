@@ -1,6 +1,6 @@
 const { profile } = require("./models/profile.js");
 
-module.exports.createNewUser = async (userId, username, registered = true) => {
+module.exports.createNewUser = async (userId, username, registered = true, statistics) => {
     // console.log("Hello")
     const newProfile = new profile({
         username: username,
@@ -9,11 +9,14 @@ module.exports.createNewUser = async (userId, username, registered = true) => {
         userRatings: [],
         rating: 0,
         ratings: [],
-        ratingCunt: 0,
+        ratingCount: 0,
         ratingSum: 0,
-        ratingAverage: 0,
         comments: [],
         canComment: true,
+        statistics: {
+            ...statistics
+        }
+        
     });
     try {
         await newProfile.save();
@@ -50,3 +53,5 @@ module.exports.registerUser = async(userId) => {
         return false;
     }
 }
+
+

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Container, Grid, Typography } from "@mui/material";
 
 const Home = ({loggedIn}) => {
     return (

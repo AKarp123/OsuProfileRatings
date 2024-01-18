@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const { redirectPage, authenticate, fetchUserStats } = require("./osu.js");
-const { getUser, createNewUser, registerUser } = require("./profileCreation.js");
+const { getUser, createNewUser, registerUser } = require("./profileMethods.js");
 const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
@@ -49,19 +49,22 @@ app.get("/oauth/login", (req, res) => {
                 req.session.username = user_data.username;
                 getUser(user_data.id).then((user) => {
                     if (user === null) {
-                        createNewUser(user_data.id, user_data.username).then(
-                            () => {
-                                console.log(
-                                    "User " + user_data.username + " created"
-                                );
-                            }
-                        );
-                    }
-                    else {
-                        if(user.registered === false) {
+                        createNewUser(user_data.id, user_data.username, true, {
+                            rank: user_data.statistics.global_rank,
+                            pp: user_data.statistics.pp,
+                            lastUpdated: Date.now(),
+                        }).then(() => {
+                            console.log(
+                                "User " + user_data.username + " created"
+                            );
+                        });
+                    } else {
+                        if (user.registered === false) {
                             registerUser(user_data.id).then(() => {
-                                console.log("User " + user_data.username + " registered");
-                            })
+                                console.log(
+                                    "User " + user_data.username + " registered"
+                                );
+                            });
                         }
                     }
                 });
@@ -94,25 +97,29 @@ app.get("/oauth/login", (req, res) => {
 // });
 app.get("/api/profile", async (req, res) => {
     const { id } = req.query;
-    console.log("hello");
     getUser(id).then((user) => {
         if (user === null) {
-            console.log("Generating new unregistered user");
-            // createNewUser(id, req.body.username, false).then(() => {
-            //     console.log("User " + req.body.username + " created");
-            // });'
             fetchUserStats(id).then((user) => {
-                
-                if(user.error === null) {
-                    return res.json({success: false, message: "Error getting user data. Please try again later. (User is likely banned)"});
+                if (user.error === null) {
+                    return res.json({
+                        success: false,
+                        message:
+                            "Error getting user data. Please try again later. (User is likely banned)",
+                    });
                 }
-                createNewUser(id, user.username, false).then(() => {
-                    console.log("User " + user.username + " created");
+                createNewUser(id, user.username, false, {
+                    rank: user.statistics.global_rank,
+                    pp: user.statistics.pp,
+                    lastUpdated: Date.now(),
                 })
-                .catch((err) => {
-                    // console.log("Error creating new user", err);
-                    
-                })
+                    .then(() => {
+                        console.log(
+                            `Unregistered user ${user.username} (${user.id}) created`
+                        );
+                    })
+                    .catch((err) => {
+                        // console.log("Error creating new user", err);
+                    });
             });
         } else {
             res.json({
