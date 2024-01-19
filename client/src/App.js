@@ -1,11 +1,12 @@
 import "./App.css";
 import { useEffect, useState, createContext, useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, redirect } from "react-router-dom";
 import Home from "./Components/Home";
 import Profile from "./Components/Profile";
 import axios from "axios";
 import User from "./Providers/User";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import Navbar from "./Components/Navbar";
 
 
 const darkTheme = createTheme({
@@ -50,11 +51,13 @@ function App() {
                             if (res.data.success) {
                                 setUser(null);
                                 setIsLoggedIn(false);
+                                redirect("/");
                             }
                         });
                     },
                 }}
             >
+                <Navbar />
                 <Routes>
                     <Route path="/" element={<Home loggedIn={isLoggedIn} />} />
                     <Route path="/profile" element={<Profile user={user} />} />

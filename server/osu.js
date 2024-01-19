@@ -1,8 +1,9 @@
 const {v2, auth} = require('osu-api-extended')
+require('dotenv').config()
 
 const client = {
-    id: 29495,
-    secret: 'qDdBFCDfLyNI1ifKDrNsYUyEeTYNmMK5ihgm3Ibx',
+    id: process.env.client_id,
+    secret: process.env.client_secret,
     url:  "http://localhost:3000/oauth/login"
 }
 

@@ -1,3 +1,4 @@
+
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useContext, useEffect } from "react";
@@ -10,7 +11,6 @@ const Profile = ({ user }) => {
     // console.log(id)
     const logout = () => {
         userContext.logOut();
-        navigate("/");
     };
     if (!user) {
         return (
