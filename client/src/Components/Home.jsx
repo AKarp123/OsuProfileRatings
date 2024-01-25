@@ -12,7 +12,7 @@ const Home = () => {
                 <Grid item xs={12} md={8}>
                     <Paper elevation={1} sx={{padding: "100px", alignItems: "center", justifyContent: "center", borderRadius: "20px"}}>
                         <Typography variant="h3" align="center" sx={{mb: "30px"}}>
-                            Osu Profile Ratings
+                            Osu Profile Commenting System
                         </Typography>
 
                         <Typography variant="h5" align="center" paragraph>

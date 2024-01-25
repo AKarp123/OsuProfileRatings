@@ -1,6 +1,11 @@
 const { profile } = require("./models/profile.js");
 
-module.exports.createNewUser = async (userId, username, registered = true, statistics) => {
+module.exports.createNewUser = async (
+    userId,
+    username,
+    registered = true,
+    statistics
+) => {
     // console.log("Hello")
     const newProfile = new profile({
         username: username,
@@ -14,44 +19,37 @@ module.exports.createNewUser = async (userId, username, registered = true, stati
         comments: [],
         canComment: true,
         statistics: {
-            ...statistics
-        }
-        
+            ...statistics,
+        },
     });
     try {
         await newProfile.save();
-
-    }
-    catch(e) {
-        console.log(e)
+    } catch (e) {
+        throw new Error("Error creating user: ", e);
     }
 };
 
-module.exports.getUser = async(userId) => {
-    try{ 
-
-        const user = await profile.findOne({ userId: userId }).exec();
-        return user;
+module.exports.getUser = async (userId) => {
+    if(isNaN(userId) || userId === undefined) {
+        throw new Error("Invalid userId");
     }
-    catch(e) {
-        console.log("error getting user");
-        return null;
-    }
-};
-
-module.exports.registerUser = async(userId) => {
-
     try {
-        const user = await profile.findOne({userId: userId}).exec();
+        const user = await profile.findOne({ userId: userId }).populate().exec();
+        return user;
+    } catch (e) {
+        console.log("error getting user");
+        throw new Error("Unable to get user");
+    }
+};
+
+module.exports.registerUser = async (userId) => {
+    try {
+        const user = await profile.findOne({ userId: userId }).exec();
         user.registered = true;
         await user.save();
-        return true;    
-
-    }
-    catch(e) {
+        return true;
+    } catch (e) {
         console.log("error registering user");
         return false;
     }
-}
-
-
+};

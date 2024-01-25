@@ -78,65 +78,67 @@ app.get("/oauth/login", (req, res) => {
     }
 });
 
-// app.get("/profile", (req, res) => {
-//     if (req.session.user_id) {
-//         res.send("Logged in as " + req.session.user_id + " - " + req.session.username);
-//     } else {
-//         res.send("Not logged in");
-//     }
-// });
-
-// app.get("/api/profile", requireLogin, (req, res) => {
-//     console.log("hello1");
-//     getUser(req.session.user_id).then((user) => {
-//         res.json({
-//             success: true,
-//             user: user,
-//         });
-//     });
-// });
 app.get("/api/profile", async (req, res) => {
     const { id } = req.query;
-    getUser(id).then((user) => {
-        if (user === null) {
-            fetchUserStats(id).then((user) => {
-                if (user.error === null) {
-                    return res.json({
-                        success: false,
-                        message:
-                            "Error getting user data. Please try again later. (User is likely banned)",
-                    });
-                }
-                createNewUser(id, user.username, false, {
-                    rank: user.statistics.global_rank,
-                    pp: user.statistics.pp,
-                    lastUpdated: Date.now(),
-                })
-                    .then(() => {
-                        console.log(
-                            `Unregistered user ${user.username} (${user.id}) created`
-                        );
+    getUser(id)
+        .then((user) => {
+            if (user === null) {
+                fetchUserStats(id).then((user) => {
+                    if (user.error === null) {
+                        return res.json({
+                            success: false,
+                            message:
+                                "Error getting user data. Please try again later. (User is likely banned)",
+                        });
+                    }
+                    createNewUser(id, user.username, false, {
+                        rank: user.statistics.global_rank,
+                        pp: user.statistics.pp,
+                        lastUpdated: Date.now(),
                     })
-                    .catch((err) => {
-                        // console.log("Error creating new user", err);
-                    });
+                        .then(() => {
+                            console.log(
+                                `Unregistered user ${user.username} (${user.id}) created`
+                            );
+                        })
+                        .catch((err) => {
+                            console.log("Error creating new user", err);
+                        });
+                });
+            } else {
+                res.json({
+                    success: true,
+                    user: user,
+                });
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+            return res.json({
+                success: false,
+                message: "Unable to get user info, try again later",
             });
-        } else {
+        });
+});
+
+app.post("/api/submitComment", requireLogin, (req, res) => { 
+
+    const { id, comment } = req.body;
+    
+
+});
+
+app.get("/api/getUserData", requireLogin, (req, res) => {
+    getUser(req.session.user_id)
+        .then((user) => {
             res.json({
                 success: true,
                 user: user,
             });
-        }
-    });
-});
-
-app.get("/api/getUserData", requireLogin, (req, res) => {
-    getUser(req.session.user_id).then((user) => {
-        res.json({
-            success: true,
-            user: user,
+        })
+        .catch((e) => {
+            console.log(e);
         });
-    });
 });
 
 app.get("/api/logout", (req, res) => {
@@ -157,6 +159,15 @@ app.listen(port, () => {
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
     console.log("Connected to MongoDB");
+    db.collection("profiles").createIndex(
+        { key: 1 },
+        {
+            collation: {
+                locale: "en",
+                strength: 1,
+            },
+        }
+    );
     // db.dropDatabase();
     // console.log("Database Reset")
 });

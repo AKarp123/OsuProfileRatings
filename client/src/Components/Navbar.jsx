@@ -36,65 +36,68 @@ const Navbar = () => {
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
                 <Toolbar>
-                    
-                    <Box sx={{ flexGrow: 1 }}>
+                    <Box sx={{ flexGrow: 1, display: "flex" }}>
                         <Button
-                            sx={{ my: 2, color: "white", display: "block" }}
+                            component={Link}
+                            to="/"
+                            sx={{ my: 2, color: "white",}}
                         >
                             Home
                         </Button>
                     </Box>
 
-                    {!userContext.isLoggedIn ? (
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="http://localhost:3000/login"
-                        >
-                            Login
-                        </Button>
-                    ) : (
-                        ""
-                    )}
-                    {userContext.isLoggedIn && (
-                        <div>
-                            <IconButton
-                                size="large"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleMenu}
+                    <Box sx={{ flexGrow: 0, display: "flex" }}>
+                        {!userContext.isLoggedIn ? (
+                            <Button
                                 color="inherit"
+                                component={Link}
+                                to="http://localhost:3000/login"
                             >
-                                <AccountCircle />
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                open={Boolean(anchorEl)}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={handleClose}>
-                                    Profile
-                                </MenuItem>
-                                <MenuItem onClick={handleClose}>
-                                    My account
-                                </MenuItem>
-                                <MenuItem onClick={handleLogout}>
-                                    Logout
-                                </MenuItem>
-                            </Menu>
-                        </div>
-                    )}
+                                Login
+                            </Button>
+                        ) : (
+                            ""
+                        )}
+                        {userContext.isLoggedIn && (
+                            <div>
+                                <IconButton
+                                    size="large"
+                                    aria-label="account of current user"
+                                    aria-controls="menu-appbar"
+                                    aria-haspopup="true"
+                                    onClick={handleMenu}
+                                    color="inherit"
+                                >
+                                    <img src={`https://a.ppy.sh/${userContext.user.userId}`} alt="avatar" style={{width: "30px", height: "30px", borderRadius: "50%"}}/>
+                                </IconButton>
+                                <Menu
+                                    id="menu-appbar"
+                                    anchorEl={anchorEl}
+                                    anchorOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem onClick={handleClose}>
+                                        Profile
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                        My account
+                                    </MenuItem>
+                                    <MenuItem onClick={handleLogout}>
+                                        Logout
+                                    </MenuItem>
+                                </Menu>
+                            </div>
+                        )}
+                    </Box>
                 </Toolbar>
             </AppBar>
         </Box>

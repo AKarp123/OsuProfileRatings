@@ -26,8 +26,13 @@ module.exports.fetchUserStats = async(id) => {
     // console.log(id)
     await auth.login(client.id, client.secret, ["public"])
 
+    let type = "id";
+    if(isNaN(id)) {
+        type = "username";
+    }
+    
     try {
-        const user = await v2.user.details(id, "osu", "id")
+        const user = await v2.user.details(id, "osu", type)
         return user;
 
     }
