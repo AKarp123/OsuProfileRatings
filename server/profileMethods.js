@@ -1,4 +1,5 @@
 const { profile } = require("./models/profile.js");
+const { comment } = require("./models/comment.js");
 
 module.exports.createNewUser = async (
     userId,
@@ -30,11 +31,14 @@ module.exports.createNewUser = async (
 };
 
 module.exports.getUser = async (userId) => {
-    if(isNaN(userId) || userId === undefined) {
+    if (isNaN(userId) || userId === undefined) {
         throw new Error("Invalid userId");
     }
     try {
-        const user = await profile.findOne({ userId: userId }).populate().exec();
+        const user = await profile
+            .findOne({ userId: userId })
+            .populate("comments")
+            .exec();
         return user;
     } catch (e) {
         console.log("error getting user");
@@ -50,6 +54,30 @@ module.exports.registerUser = async (userId) => {
         return true;
     } catch (e) {
         console.log("error registering user");
+        return false;
+    }
+};
+
+module.exports.addNewComment = async (
+    userId,
+    authorID,
+    username,
+    commentText
+) => {
+    try {
+        const user = await profile.findOne({ userId: userId }).exec();
+        const newComment = new comment({
+            username: username,
+            userId: authorID,
+            comment: commentText,
+            date: Date.now(),
+        });
+        await newComment.save();
+        user.comments.push(newComment);
+        await user.save();
+        return true;
+    } catch (e) {
+        console.log("error adding comment");
         return false;
     }
 };

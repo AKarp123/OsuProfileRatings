@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const { redirectPage, authenticate, fetchUserStats } = require("./osu.js");
-const { getUser, createNewUser, registerUser } = require("./profileMethods.js");
+const { getUser, createNewUser, registerUser, addNewComment } = require("./profileMethods.js");
 const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
@@ -34,6 +34,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+
     redirectPage().then((url) => {
         res.redirect(url);
     });
@@ -100,6 +101,10 @@ app.get("/api/profile", async (req, res) => {
                             console.log(
                                 `Unregistered user ${user.username} (${user.id}) created`
                             );
+                            return res.json({
+                                success: true,
+                                user: user,
+                            });
                         })
                         .catch((err) => {
                             console.log("Error creating new user", err);
@@ -159,15 +164,13 @@ app.listen(port, () => {
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
     console.log("Connected to MongoDB");
-    db.collection("profiles").createIndex(
-        { key: 1 },
-        {
-            collation: {
-                locale: "en",
-                strength: 1,
-            },
-        }
-    );
+    
+    // addNewComment(11625048, 11625048, "Kawambiit", "test").then(() => {
+    //     console.log("Comment added");
+    // });
+
+
+    // db.collection("profiles").drop();
     // db.dropDatabase();
     // console.log("Database Reset")
 });

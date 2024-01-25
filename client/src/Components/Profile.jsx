@@ -12,12 +12,17 @@ import {
     Container,
     Grid,
     Divider,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
+    Avatar,
 } from "@mui/material";
+import { FixedSizeList } from "react-window";
 
 const Profile = ({ user }) => {
     const userContext = useContext(User);
     const { id } = useParams();
-    console.log(user)
 
     const logout = () => {
         userContext.logOut();
@@ -25,7 +30,22 @@ const Profile = ({ user }) => {
     if (!user) {
         return (
             <div>
-                <p>{!id ? "Not Logged In" : <OtherUser id={id} />} </p>
+                <p>
+                    {!id ? (
+                        "Not Logged In"
+                    ) : (
+                        <Grid
+                            container
+                            spacing={2}
+                            justifyContent="center"
+                            sx={{ mt: "7.5vw" }}
+                        >
+                            <Grid item xs={12} md={8}>
+                                <OtherUser id={id} />
+                            </Grid>
+                        </Grid>
+                    )}{" "}
+                </p>
                 <Link to="/">Home</Link>
             </div>
         );
@@ -33,29 +53,38 @@ const Profile = ({ user }) => {
     return (
         <div>
             <p>
-                {/* {!id ? (
-                    "Logged into: " + userId + " - " + username
-                ) : (
-                    <OtherUser id={id} />
-                )} */}
-
-                <Grid
-                    container
-                    spacing={2}
-                    justifyContent="center"
-                    sx={{ mt: "7.5vw" }}
-                >
-                    <Grid item xs={12} md={8}>
-                        <ProfileCard profileData={user} />
+                {!id ? (
+                    <Grid
+                        container
+                        spacing={2}
+                        justifyContent="center"
+                        sx={{ mt: "7.5vw" }}
+                    >
+                        <Grid item xs={12} md={8}>
+                            <ProfileCard profileData={user} />
+                        </Grid>
                     </Grid>
-                </Grid>
+                ) : (
+                    <Grid
+                        container
+                        spacing={2}
+                        justifyContent="center"
+                        sx={{ mt: "7.5vw" }}
+                    >
+                        <Grid item xs={12} md={8}>
+                            <OtherUser id={id} />
+                        </Grid>
+                    </Grid>
+                )}
             </p>
         </div>
     );
 };
 
 const OtherUser = ({ id }) => {
+    const [userData, setUserData] = useState(null);
     const [error, setError] = useState(false);
+
     useEffect(() => {
         axios
             .get("/api/profile", {
@@ -64,35 +93,33 @@ const OtherUser = ({ id }) => {
                 },
             })
             .then((res) => {
-                console.log(res.data);
+                setUserData(res.data);
                 setError(!res.data.success);
             });
-    });
+    }, []);
 
-    if (error) {
-        return (
-            <div>
-                <p>Error fetching user data</p>
-            </div>
-        );
+    if (userData == null) {
+        return <div>Loading...</div>;
     }
 
-    return (
-        <div>
-            <p>Viewing user: {id}</p>
-        </div>
-    );
+    return <ProfileCard profileData={userData.user} />;
 };
 
 const ProfileCard = ({ profileData }) => {
     return (
-        <Card sx={{ display: "flex" }}>
+        <Card sx={{ display: "flex", maxHeight: "100%" }}>
             <Grid container spacing={0} justifyContent="center" columns={16}>
                 <Grid item xs={16} md={6}>
                     <Box>
                         <CardContent>
-                            <Typography variant="h4" sx={{ my: "0.5vh"}} align={"center"}>{profileData.username}</Typography>
-                            <Divider variant="middle" sx={{ my: "1vh"}}/>
+                            <Typography
+                                variant="h4"
+                                sx={{ my: "0.5vh" }}
+                                align={"center"}
+                            >
+                                {profileData.username}
+                            </Typography>
+                            <Divider variant="middle" sx={{ my: "1vh" }} />
                             <img
                                 src={`https://a.ppy.sh/${profileData.userId}`}
                                 alt="avatar"
@@ -106,10 +133,21 @@ const ProfileCard = ({ profileData }) => {
                                 }}
                             />
                         </CardContent>
-                        <Divider variant="middle" sx={{ my: "1vh" }}/>
-                        <CardContent sx={{display: "flex", flexGrow: 1, flexDirection: "row", justifyContent: "space-between"}}>
-                            <Typography variant="h6" align={"center"}>#{profileData.statistics.rank}</Typography>
-                            <Typography variant="h6" align={"center"}>{Math.round(profileData.statistics.pp)}pp</Typography>
+                        <Divider variant="middle" sx={{ my: "1vh" }} />
+                        <CardContent
+                            sx={{
+                                display: "flex",
+                                flexGrow: 1,
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <Typography variant="h6" align={"center"}>
+                                #{profileData.statistics.rank}
+                            </Typography>
+                            <Typography variant="h6" align={"center"}>
+                                {Math.round(profileData.statistics.pp)}pp
+                            </Typography>
                         </CardContent>
                     </Box>
                 </Grid>
@@ -126,8 +164,11 @@ const ProfileCard = ({ profileData }) => {
                     sx={{ sm: { display: "flex" }, md: { display: "none" } }}
                 />
                 <Grid item xs={16} md={9}>
-                    <Container maxWidth="lg" sx={{mt: "1vw"}}>
-                            <Typography variant="h4" color="white" align="center">Comments</Typography>
+                    <Container maxWidth="lg" sx={{ mt: "1vw", maxHeight: "100%" }}>
+                        <Typography variant="h4" color="white" align="center">
+                            Comments
+                        </Typography>
+                        <CommentList comments={profileData.comments} />
                     </Container>
                 </Grid>
             </Grid>
@@ -135,6 +176,33 @@ const ProfileCard = ({ profileData }) => {
     );
 };
 
+const CommentList = ({ comments }) => {
+    return (
+        <List sx={{maxHeight: "400px", overflow: "auto"}}>
+            {comments.map((comment) => {
+                return (
+                    <CommentListItem
+                        username={comment.username}
+                        id={comment.userId}
+                        commentText={comment.comment}
+                    />
+                );
+            })}
+        </List>
+    );
+};
 
+const CommentListItem = ({ username, id, commentText }) => {
+    return (
+        <>
+            <ListItem alignItems="flex-start">
+                <ListItemAvatar>
+                    <Avatar src={`https://a.ppy.sh/${id}`} alt={username} />
+                </ListItemAvatar>
+                <ListItemText primary={username} secondary={commentText} />
+            </ListItem>
+        </>
+    );
+};
 
 export default Profile;
