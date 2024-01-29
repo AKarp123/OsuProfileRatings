@@ -1,8 +1,8 @@
 import "./App.css";
 import { useEffect, useState, createContext, useContext } from "react";
-import { Routes, Route, redirect } from "react-router-dom";
+import { Routes, Route, redirect, useNavigate } from "react-router-dom";
 import Home from "./Components/Home";
-import Profile from "./Components/Profile";
+import Profile from "./Components/Profile/Profile";
 import axios from "axios";
 import User from "./Providers/User";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
@@ -18,6 +18,7 @@ const darkTheme = createTheme({
 function App() {
     const [user, setUser] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios
@@ -51,7 +52,7 @@ function App() {
                             if (res.data.success) {
                                 setUser(null);
                                 setIsLoggedIn(false);
-                                redirect("/");
+                                navigate("/");
                             }
                         });
                     },

@@ -37,8 +37,11 @@ module.exports.getUser = async (userId) => {
     try {
         const user = await profile
             .findOne({ userId: userId })
-            .populate("comments")
+            .populate("comments" )
             .exec();
+        user.comments.sort((a, b) => {
+            return b.date - a.date;
+        });
         return user;
     } catch (e) {
         console.log("error getting user");
@@ -66,6 +69,9 @@ module.exports.addNewComment = async (
 ) => {
     try {
         const user = await profile.findOne({ userId: userId }).exec();
+        if (user.canComment === false) {
+            throw new Error("User cannot comment");
+        }
         const newComment = new comment({
             username: username,
             userId: authorID,
@@ -75,9 +81,9 @@ module.exports.addNewComment = async (
         await newComment.save();
         user.comments.push(newComment);
         await user.save();
-        return true;
+        return newComment;
     } catch (e) {
-        console.log("error adding comment");
-        return false;
+        console.log("error adding comment", e);
+        throw new Error("Error adding comment");
     }
 };

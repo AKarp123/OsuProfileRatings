@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { useContext, useEffect } from "react";
-import User from "../Providers/User";
+import User from "../../Providers/User";
 import { useState } from "react";
 import {
     Box,
@@ -12,17 +12,14 @@ import {
     Container,
     Grid,
     Divider,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
-    Avatar,
 } from "@mui/material";
-import { FixedSizeList } from "react-window";
+import CommentList from "./CommentList";
+import CommentForm from "./CommentForm";
 
 const Profile = ({ user }) => {
     const userContext = useContext(User);
     const { id } = useParams();
+    // console.log(id);
 
     const logout = () => {
         userContext.logOut();
@@ -38,15 +35,14 @@ const Profile = ({ user }) => {
                             container
                             spacing={2}
                             justifyContent="center"
-                            sx={{ mt: "7.5vw" }}
+                            sx={{ mt: "4.5vw" }}
                         >
                             <Grid item xs={12} md={8}>
                                 <OtherUser id={id} />
                             </Grid>
                         </Grid>
-                    )}{" "}
+                    )}
                 </p>
-                <Link to="/">Home</Link>
             </div>
         );
     }
@@ -58,7 +54,7 @@ const Profile = ({ user }) => {
                         container
                         spacing={2}
                         justifyContent="center"
-                        sx={{ mt: "7.5vw" }}
+                        sx={{ mt: "4.5vw" }}
                     >
                         <Grid item xs={12} md={8}>
                             <ProfileCard profileData={user} />
@@ -69,7 +65,7 @@ const Profile = ({ user }) => {
                         container
                         spacing={2}
                         justifyContent="center"
-                        sx={{ mt: "7.5vw" }}
+                        sx={{ mt: "4.5vw" }}
                     >
                         <Grid item xs={12} md={8}>
                             <OtherUser id={id} />
@@ -83,7 +79,6 @@ const Profile = ({ user }) => {
 
 const OtherUser = ({ id }) => {
     const [userData, setUserData] = useState(null);
-    const [error, setError] = useState(false);
 
     useEffect(() => {
         axios
@@ -93,19 +88,33 @@ const OtherUser = ({ id }) => {
                 },
             })
             .then((res) => {
+                
                 setUserData(res.data);
-                setError(!res.data.success);
             });
     }, []);
-
+    
     if (userData == null) {
         return <div>Loading...</div>;
     }
+    if(userData.success === false){
+        return <div>{userData.message}</div>
+    }
+    return (
+        <div>
+            <ProfileCard profileData={userData.user} />
+        </div>
+    );
+    
 
-    return <ProfileCard profileData={userData.user} />;
 };
 
 const ProfileCard = ({ profileData }) => {
+    console.log(profileData)
+    const [comments, setComments] = useState(profileData.comments);
+    const updateComments = (newComment) => {
+        console.log("HELLO")
+        setComments([newComment, ...comments]);
+    }
     return (
         <Card sx={{ display: "flex", maxHeight: "100%" }}>
             <Grid container spacing={0} justifyContent="center" columns={16}>
@@ -164,44 +173,34 @@ const ProfileCard = ({ profileData }) => {
                     sx={{ sm: { display: "flex" }, md: { display: "none" } }}
                 />
                 <Grid item xs={16} md={9}>
-                    <Container maxWidth="lg" sx={{ mt: "1vw", maxHeight: "100%" }}>
+                    <Container
+                        maxWidth="lg"
+                        sx={{ mt: "1vw", maxHeight: "100%" }}
+                    >
                         <Typography variant="h4" color="white" align="center">
                             Comments
                         </Typography>
-                        <CommentList comments={profileData.comments} />
+                        <CommentList comments={comments} />
                     </Container>
+                </Grid>
+                {/* <Grid item xs={16} md={6}>
+                    <Container maxWidth="lg" sx={{ mt: "1vw" }}>
+                        <Typography variant="h4" color="white" align="center">
+                            Your Comments
+                        </Typography>
+                        
+                    </Container>
+                </Grid> */}
+                <Grid item xs={16} md={9}>
+                    
+                        <Typography variant="h4" color="white" align="center">
+                            Comment
+                        </Typography>
+                        <CommentForm userId={profileData.userId} updateComments={updateComments} />
+                    
                 </Grid>
             </Grid>
         </Card>
-    );
-};
-
-const CommentList = ({ comments }) => {
-    return (
-        <List sx={{maxHeight: "400px", overflow: "auto"}}>
-            {comments.map((comment) => {
-                return (
-                    <CommentListItem
-                        username={comment.username}
-                        id={comment.userId}
-                        commentText={comment.comment}
-                    />
-                );
-            })}
-        </List>
-    );
-};
-
-const CommentListItem = ({ username, id, commentText }) => {
-    return (
-        <>
-            <ListItem alignItems="flex-start">
-                <ListItemAvatar>
-                    <Avatar src={`https://a.ppy.sh/${id}`} alt={username} />
-                </ListItemAvatar>
-                <ListItemText primary={username} secondary={commentText} />
-            </ListItem>
-        </>
     );
 };
 

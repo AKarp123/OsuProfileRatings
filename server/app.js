@@ -6,6 +6,7 @@ const { getUser, createNewUser, registerUser, addNewComment } = require("./profi
 const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo");
 
 mongoose.connect("mongodb://localhost:27017/osuProfileRatings");
 const db = mongoose.connection;
@@ -16,6 +17,9 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: { maxAge: 3600 * 24 * 1000 }, // 1 day
+        store: MongoStore.create({
+            mongoUrl: "mongodb://localhost:27017/osuProfileRatings",
+        }),
     })
 );
 
@@ -128,7 +132,23 @@ app.get("/api/profile", async (req, res) => {
 
 app.post("/api/submitComment", requireLogin, (req, res) => { 
 
-    const { id, comment } = req.body;
+    const {userId, comment } = req.body;
+    console.log(userId, req.session.user_id, req.session.username, comment)
+    
+
+    addNewComment(userId, req.session.user_id, req.session.username, comment).then((comment) => {
+        res.json({
+            success: true,
+            message: "Comment added",
+            comment: comment,
+        });
+    }).catch((e) => {
+        console.log("Comment not added", e)
+        res.json({
+            success: false,
+            message: "Comment not added"
+        })
+    })
     
 
 });
