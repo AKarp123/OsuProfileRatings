@@ -33,7 +33,8 @@ const CommentList = ({ comments }) => {
 const CommentListItem = ({ username, id, commentText }) => {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/profile/${id}`);
+        navigate(`/profile/${id}`, {replace: true});
+        
     }
     const style = {
         cursor: "pointer"

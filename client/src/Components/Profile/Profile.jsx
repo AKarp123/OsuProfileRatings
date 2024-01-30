@@ -16,105 +16,100 @@ import {
 import CommentList from "./CommentList";
 import CommentForm from "./CommentForm";
 
-const Profile = ({ user }) => {
+const Profile = () => {
     const userContext = useContext(User);
     const { id } = useParams();
+    const [user, setUser] = useState(userContext.user);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     // console.log(id);
 
-    const logout = () => {
-        userContext.logOut();
-    };
-    if (!user) {
+    useEffect(() => {
+        if (id) {
+            axios
+                .get("/api/profile", {
+                    params: {
+                        id: id,
+                    },
+                })
+                .then((res) => {
+                    console.log(res.data.user);
+                    setUser(res.data.user);
+                    if (res.data.success === false) {
+                        setError(true);
+                        console.log(res.data.message);
+                    }
+                    setLoading(false);
+                });
+        }
+        if(userContext.user) {
+            // setUser(userContext.user);
+            setLoading(false);
+        }
+    }, [id]);
+
+    if (loading) {
+        return <div> Loading...</div>;
+    }
+    if (error) {
+        return <div>There was an error accessing this profile. Try again later</div>;
+    }
+    if (userContext.user || user != null) {
         return (
             <div>
-                <p>
-                    {!id ? (
-                        "Not Logged In"
-                    ) : (
-                        <Grid
-                            container
-                            spacing={2}
-                            justifyContent="center"
-                            sx={{ mt: "4.5vw" }}
-                        >
-                            <Grid item xs={12} md={8}>
-                                <OtherUser id={id} />
-                            </Grid>
-                        </Grid>
-                    )}
-                </p>
+                <Grid
+                    container
+                    spacing={2}
+                    justifyContent="center"
+                    sx={{ mt: "4.5vw" }}
+                >
+                    <Grid item xs={12} md={8}>
+                        <ProfileCard profileData={user} />
+                    </Grid>
+                </Grid>
             </div>
         );
+    } else {
+        return <div> Not Logged in! </div>;
     }
-    return (
-        <div>
-            <p>
-                {!id ? (
-                    <Grid
-                        container
-                        spacing={2}
-                        justifyContent="center"
-                        sx={{ mt: "4.5vw" }}
-                    >
-                        <Grid item xs={12} md={8}>
-                            <ProfileCard profileData={user} />
-                        </Grid>
-                    </Grid>
-                ) : (
-                    <Grid
-                        container
-                        spacing={2}
-                        justifyContent="center"
-                        sx={{ mt: "4.5vw" }}
-                    >
-                        <Grid item xs={12} md={8}>
-                            <OtherUser id={id} />
-                        </Grid>
-                    </Grid>
-                )}
-            </p>
-        </div>
-    );
 };
 
-const OtherUser = ({ id }) => {
-    const [userData, setUserData] = useState(null);
+const OtherUser = ({ user }) => {
+    const userData = user;
 
-    useEffect(() => {
-        axios
-            .get("/api/profile", {
-                params: {
-                    id: id,
-                },
-            })
-            .then((res) => {
-                
-                setUserData(res.data);
-            });
-    }, []);
-    
+    // useEffect(() => {
+    //     axios
+    //         .get("/api/profile", {
+    //             params: {
+    //                 id: id,
+    //             },
+    //         })
+    //         .then((res) => {
+
+    //             setUserData(res.data);
+    //         });
+    // }, []);
+
     if (userData == null) {
         return <div>Loading...</div>;
     }
-    if(userData.success === false){
-        return <div>{userData.message}</div>
+    if (userData.success === false) {
+        return <div>{userData.message}</div>;
     }
     return (
         <div>
             <ProfileCard profileData={userData.user} />
         </div>
     );
-    
-
 };
 
 const ProfileCard = ({ profileData }) => {
-    console.log(profileData)
+    console.log(profileData);
     const [comments, setComments] = useState(profileData.comments);
     const updateComments = (newComment) => {
-        console.log("HELLO")
+        console.log("HELLO");
         setComments([newComment, ...comments]);
-    }
+    };
     return (
         <Card sx={{ display: "flex", maxHeight: "100%" }}>
             <Grid container spacing={0} justifyContent="center" columns={16}>
@@ -192,12 +187,13 @@ const ProfileCard = ({ profileData }) => {
                     </Container>
                 </Grid> */}
                 <Grid item xs={16} md={9}>
-                    
-                        <Typography variant="h4" color="white" align="center">
-                            Comment
-                        </Typography>
-                        <CommentForm userId={profileData.userId} updateComments={updateComments} />
-                    
+                    <Typography variant="h4" color="white" align="center">
+                        Comment
+                    </Typography>
+                    <CommentForm
+                        userId={profileData.userId}
+                        updateComments={updateComments}
+                    />
                 </Grid>
             </Grid>
         </Card>

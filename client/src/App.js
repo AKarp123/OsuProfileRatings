@@ -59,14 +59,7 @@ function App() {
                 }}
             >
                 <Navbar />
-                <Routes>
-                    <Route path="/" element={<Home loggedIn={isLoggedIn} />} />
-                    <Route path="/profile" element={<Profile user={user} />} />
-                    <Route
-                        path="/profile/:id"
-                        element={<Profile user={user} />}
-                    />
-                </Routes>
+                
             </User.Provider>
             </ThemeProvider>
         </>

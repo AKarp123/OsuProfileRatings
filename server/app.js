@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const { redirectPage, authenticate, fetchUserStats } = require("./osu.js");
-const { getUser, createNewUser, registerUser, addNewComment } = require("./profileMethods.js");
+const { getUser, createNewUser, registerUser, addNewComment, clearComments } = require("./profileMethods.js");
 const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
@@ -112,6 +112,11 @@ app.get("/api/profile", async (req, res) => {
                         })
                         .catch((err) => {
                             console.log("Error creating new user", err);
+                            return res.json({
+                                success: false,
+                                message:
+                                    "Error creating new user. Please try again later.",
+                            });
                         });
                 });
             } else {
@@ -193,4 +198,7 @@ db.once("open", function () {
     // db.collection("profiles").drop();
     // db.dropDatabase();
     // console.log("Database Reset")
+    // clearComments(11625048).then(() => {
+    //     console.log("Comments cleared");
+    // });
 });

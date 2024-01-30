@@ -87,3 +87,15 @@ module.exports.addNewComment = async (
         throw new Error("Error adding comment");
     }
 };
+
+module.exports.clearComments = async (userId) => {
+    try {
+        const user = await profile.findOne({ userId: userId }).exec();
+        user.comments = [];
+        await user.save();
+        return true;
+    } catch (e) {
+        console.log("error clearing comments", e);
+        return false;
+    }
+}

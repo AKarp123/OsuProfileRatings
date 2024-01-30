@@ -31,6 +31,7 @@ const CommentForm = ({ userId, updateComments }) => {
                 else {
                     setStatus({ type: "error", message: res.data.message });
                 }
+                setComment("");
             })
             .catch((err) => {
                 console.log(err);
@@ -80,15 +81,8 @@ const CommentForm = ({ userId, updateComments }) => {
                     variant="filled"
                     sx={{ width: "100%" }}
                 >
+                    
                     {status.message}
-                    <IconButton
-                        size="small"
-                        aria-label="close"
-                        color="inherit"
-                        onClick={() => setStatus({ type: "", message: "" })}
-                    >
-                        <CloseIcon fontSize="small" />
-                    </IconButton>
                 </Alert>
             </Snackbar>
         </>
