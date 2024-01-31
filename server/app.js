@@ -7,8 +7,9 @@ const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
+require("dotenv").config();
 
-mongoose.connect("mongodb://localhost:27017/osuProfileRatings");
+mongoose.connect(process.env.MONGODB_URI + "/osuProfileRatings");
 const db = mongoose.connection;
 
 app.use(

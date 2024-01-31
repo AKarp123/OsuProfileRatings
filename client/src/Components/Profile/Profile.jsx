@@ -188,14 +188,21 @@ const ProfileCard = ({ profileData, updateComments }) => {
                     </Container>
                 </Grid>
                 <Grid item xs={16} md={9}>
-                    <Typography variant="h4" color="white" align="center">
-                        Comment
-                    </Typography>
                     {userContext.isLoggedIn && (
-                        <CommentForm
-                            userId={profileData.userId}
-                            updateComments={updateComments}
-                        />
+                        <>
+                            <Typography
+                                variant="h4"
+                                color="white"
+                                align="center"
+                            >
+                                Comment
+                            </Typography>
+
+                            <CommentForm
+                                userId={profileData.userId}
+                                updateComments={updateComments}
+                            />
+                        </>
                     )}
                 </Grid>
             </Grid>
