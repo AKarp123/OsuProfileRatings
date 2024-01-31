@@ -15,14 +15,18 @@ import {
 } from "@mui/material";
 import CommentList from "./CommentList";
 import CommentForm from "./CommentForm";
+import Loading from "../Loading";
 
 const Profile = () => {
     const userContext = useContext(User);
     const { id } = useParams();
-    const [user, setUser] = useState(userContext.user);
+    const [user, setUser] = useState(id ? null : userContext.user);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    // console.log(id);
+
+    const updateComments = (newComment) => {
+        setUser({ ...user, comments: [...user.comments, newComment] });
+    };
 
     useEffect(() => {
         if (id) {
@@ -33,7 +37,6 @@ const Profile = () => {
                     },
                 })
                 .then((res) => {
-                    console.log(res.data.user);
                     setUser(res.data.user);
                     if (res.data.success === false) {
                         setError(true);
@@ -42,19 +45,26 @@ const Profile = () => {
                     setLoading(false);
                 });
         }
-        if(userContext.user) {
+        // console.log(userContext.user)
+        if (userContext.user) {
             // setUser(userContext.user);
             setLoading(false);
         }
     }, [id]);
 
     if (loading) {
-        return <div> Loading...</div>;
+        return <Loading />;
     }
     if (error) {
-        return <div>There was an error accessing this profile. Try again later</div>;
+        return (
+            <div>
+                There was an error accessing this profile. Try again later
+            </div>
+        );
     }
-    if (userContext.user || user != null) {
+    if (user !== null) {
+        // console.log("GM")
+        console.log(user);
         return (
             <div>
                 <Grid
@@ -64,7 +74,7 @@ const Profile = () => {
                     sx={{ mt: "4.5vw" }}
                 >
                     <Grid item xs={12} md={8}>
-                        <ProfileCard profileData={user} />
+                        <ProfileCard profileData={user} updateComments={updateComments} />
                     </Grid>
                 </Grid>
             </div>
@@ -103,13 +113,8 @@ const OtherUser = ({ user }) => {
     );
 };
 
-const ProfileCard = ({ profileData }) => {
-    console.log(profileData);
-    const [comments, setComments] = useState(profileData.comments);
-    const updateComments = (newComment) => {
-        console.log("HELLO");
-        setComments([newComment, ...comments]);
-    };
+const ProfileCard = ({ profileData, updateComments }) => {
+
     return (
         <Card sx={{ display: "flex", maxHeight: "100%" }}>
             <Grid container spacing={0} justifyContent="center" columns={16}>
@@ -175,17 +180,9 @@ const ProfileCard = ({ profileData }) => {
                         <Typography variant="h4" color="white" align="center">
                             Comments
                         </Typography>
-                        <CommentList comments={comments} />
+                        <CommentList comments={profileData.comments} />
                     </Container>
                 </Grid>
-                {/* <Grid item xs={16} md={6}>
-                    <Container maxWidth="lg" sx={{ mt: "1vw" }}>
-                        <Typography variant="h4" color="white" align="center">
-                            Your Comments
-                        </Typography>
-                        
-                    </Container>
-                </Grid> */}
                 <Grid item xs={16} md={9}>
                     <Typography variant="h4" color="white" align="center">
                         Comment

@@ -1,4 +1,4 @@
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
     Container,
     Grid,
@@ -10,10 +10,12 @@ import {
 import User from "../Providers/User";
 import { useContext, useState } from "react";
 
+
 const Home = () => {
     const userContext = useContext(User);
     const [idForm, setIdForm] = useState("");
-    const navigate = useNavigate();
+    const history = useHistory();
+    
 
     return (
         <Container maxWidth="lg">
@@ -64,7 +66,7 @@ const Home = () => {
                             <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
-                                    navigate(`/profile/${idForm}`);
+                                    history.push(`/profile/${idForm}`);
                                     
                                 }}
                                 style={{

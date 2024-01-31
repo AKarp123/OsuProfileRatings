@@ -44,8 +44,8 @@ module.exports.getUser = async (userId) => {
         });
         return user;
     } catch (e) {
-        console.log("error getting user");
-        throw new Error("Unable to get user");
+        console.log("User not in DB");
+        
     }
 };
 
@@ -62,18 +62,18 @@ module.exports.registerUser = async (userId) => {
 };
 
 module.exports.addNewComment = async (
-    userId,
+    toID,
     authorID,
-    username,
+    authorUsername,
     commentText
 ) => {
     try {
-        const user = await profile.findOne({ userId: userId }).exec();
+        const user = await profile.findOne({ userId: toID }).exec();
         if (user.canComment === false) {
             throw new Error("User cannot comment");
         }
         const newComment = new comment({
-            username: username,
+            username: authorUsername,
             userId: authorID,
             comment: commentText,
             date: Date.now(),

@@ -13,12 +13,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import User from "../Providers/User";
 import { Button } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const Navbar = () => {
     const userContext = useContext(User);
     const [anchorEl, setAnchorEl] = useState(null);
-    const navigate = useNavigate();
+    const history = useHistory();
 
     const handleLogout = (event) => {
         userContext.logOut();
@@ -51,8 +51,9 @@ const Navbar = () => {
                         {!userContext.isLoggedIn ? (
                             <Button
                                 color="inherit"
-                                component={Link}
-                                to="http://localhost:3000/login"
+                                onClick={() => {
+                                   window.location.href = "http://localhost:3000/login"
+                                }}
                             >
                                 Login
                             </Button>
@@ -86,7 +87,7 @@ const Navbar = () => {
                                     open={Boolean(anchorEl)}
                                     onClose={handleClose}
                                 >
-                                    <MenuItem onClick={() => { navigate("/profile")}}>
+                                    <MenuItem onClick={() => { history.push("/profile")}}>
                                         Profile
                                     </MenuItem>
                                     <MenuItem onClick={handleClose}>

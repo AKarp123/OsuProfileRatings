@@ -87,7 +87,7 @@ app.get("/api/profile", async (req, res) => {
     const { id } = req.query;
     getUser(id)
         .then((user) => {
-            if (user === null) {
+            if (user === undefined || user === null) {
                 fetchUserStats(id).then((user) => {
                     if (user.error === null) {
                         return res.json({
@@ -101,7 +101,7 @@ app.get("/api/profile", async (req, res) => {
                         pp: user.statistics.pp,
                         lastUpdated: Date.now(),
                     })
-                        .then(() => {
+                        .then((user) => {
                             console.log(
                                 `Unregistered user ${user.username} (${user.id}) created`
                             );
@@ -120,6 +120,7 @@ app.get("/api/profile", async (req, res) => {
                         });
                 });
             } else {
+                
                 res.json({
                     success: true,
                     user: user,
@@ -190,7 +191,7 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
     console.log("Connected to MongoDB");
     
-    // addNewComment(11625048, 11625048, "Kawambiit", "test").then(() => {
+    // addNewComment(11625048, 13030453, "k0gan", "test").then(() => {
     //     console.log("Comment added");
     // });
 

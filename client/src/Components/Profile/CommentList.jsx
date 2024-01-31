@@ -6,9 +6,11 @@ import {
     ListItemText,
     ListItem,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+
 
 const CommentList = ({ comments }) => {
+    
     return (
         <List sx={{ maxHeight: "400px", overflow: "auto" }}>
             <FixedSizeList
@@ -31,9 +33,9 @@ const CommentList = ({ comments }) => {
 };
 
 const CommentListItem = ({ username, id, commentText }) => {
-    const navigate = useNavigate();
+    const history = useHistory();
     const handleClick = () => {
-        navigate(`/profile/${id}`, {replace: true});
+        history.push(`/profile/${id}`);
         
     }
     const style = {
