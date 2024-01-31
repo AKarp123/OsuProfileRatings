@@ -21,7 +21,7 @@ const Profile = () => {
     const userContext = useContext(User);
     const { id } = useParams();
     const [user, setUser] = useState(id ? null : userContext.user);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(user ? false : true);
     const [error, setError] = useState(null);
 
     const updateComments = (newComment) => {
@@ -74,7 +74,10 @@ const Profile = () => {
                     sx={{ mt: "4.5vw" }}
                 >
                     <Grid item xs={12} md={8}>
-                        <ProfileCard profileData={user} updateComments={updateComments} />
+                        <ProfileCard
+                            profileData={user}
+                            updateComments={updateComments}
+                        />
                     </Grid>
                 </Grid>
             </div>
@@ -114,6 +117,7 @@ const OtherUser = ({ user }) => {
 };
 
 const ProfileCard = ({ profileData, updateComments }) => {
+    const userContext = useContext(User);
 
     return (
         <Card sx={{ display: "flex", maxHeight: "100%" }}>
@@ -187,10 +191,12 @@ const ProfileCard = ({ profileData, updateComments }) => {
                     <Typography variant="h4" color="white" align="center">
                         Comment
                     </Typography>
-                    <CommentForm
-                        userId={profileData.userId}
-                        updateComments={updateComments}
-                    />
+                    {userContext.isLoggedIn && (
+                        <CommentForm
+                            userId={profileData.userId}
+                            updateComments={updateComments}
+                        />
+                    )}
                 </Grid>
             </Grid>
         </Card>

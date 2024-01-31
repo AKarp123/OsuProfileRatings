@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const requireLogin = (req, res, next) => {
     if (!req.session.user_id) {
-        return res.json({ success: false, error: "Not logged in" });
+        return res.json({ success: false, message: "Not logged in" });
     }
     next();
 };
@@ -53,7 +53,7 @@ app.get("/oauth/login", (req, res) => {
                 req.session.user_id = user_data.id;
                 req.session.username = user_data.username;
                 getUser(user_data.id).then((user) => {
-                    if (user === null) {
+                    if (user === undefined || user === null) {
                         createNewUser(user_data.id, user_data.username, true, {
                             rank: user_data.statistics.global_rank,
                             pp: user_data.statistics.pp,
@@ -102,6 +102,7 @@ app.get("/api/profile", async (req, res) => {
                         lastUpdated: Date.now(),
                     })
                         .then((user) => {
+                            
                             console.log(
                                 `Unregistered user ${user.username} (${user.id}) created`
                             );
@@ -202,4 +203,7 @@ db.once("open", function () {
     // clearComments(11625048).then(() => {
     //     console.log("Comments cleared");
     // });
+
+    
+
 });

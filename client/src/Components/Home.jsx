@@ -57,8 +57,9 @@ const Home = () => {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    component={Link}
-                                    to="http://localhost:3000/login"
+                                    onClick={() => {
+                                        window.location.href = "http://localhost:3000/login";
+                                    }}
                                 >
                                     Login with osu
                                 </Button>

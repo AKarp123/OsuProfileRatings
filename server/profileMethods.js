@@ -25,6 +25,7 @@ module.exports.createNewUser = async (
     });
     try {
         await newProfile.save();
+        return newProfile;
     } catch (e) {
         throw new Error("Error creating user: ", e);
     }

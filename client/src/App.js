@@ -28,6 +28,7 @@ function App() {
             .then((res) => {
                 if (res.data.success === false) {
                     console.log(res.data.message);
+                    setLoading(false);
                     return;
                 }
                 if (res.data.user !== null) {
