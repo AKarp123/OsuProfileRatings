@@ -9,17 +9,23 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
-mongoose.connect(process.env.MONGODB_URI + "/osuProfileRatings");
+mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
+
+//serve static files from the React app
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../client/build")));
+
 
 app.use(
     session({
         secret: "goodmorning",
         resave: false,
         saveUninitialized: false,
-        cookie: { maxAge: 3600 * 24 * 1000 }, // 1 day
+        cookie: { maxAge: 3600 * 3 * 1000 },
+        rolling: true, // 3 hours rolling
         store: MongoStore.create({
-            mongoUrl: "mongodb://localhost:27017/osuProfileRatings",
+            mongoUrl: process.env.MONGODB_URI,
         }),
     })
 );
@@ -34,9 +40,9 @@ const requireLogin = (req, res, next) => {
     next();
 };
 
-app.get("/", (req, res) => {
-    res.redirect("/login");
-});
+// app.get("/", (req, res) => {
+//     res.redirect("/login");
+// });
 
 app.get("/login", (req, res) => {
 
@@ -75,7 +81,7 @@ app.get("/oauth/login", (req, res) => {
                     }
                 });
 
-                res.redirect("http://localhost:3001/profile");
+                res.redirect("/profile");
             })
             .catch((err) => {
                 console.log(err);
@@ -182,8 +188,10 @@ app.get("/api/logout", (req, res) => {
     });
 });
 
-//serve static files from the React app
-app.use(express.static(path.join(__dirname, "client/build")));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

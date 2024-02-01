@@ -25,8 +25,9 @@ const Profile = () => {
     const [error, setError] = useState(null);
 
     const updateComments = (newComment) => {
-        setUser({ ...user, comments: [...user.comments, newComment] });
+        setUser({ ...user, comments: [newComment, ...user.comments ] });
     };
+    console.log(id)
 
     useEffect(() => {
         if (id) {
@@ -47,7 +48,7 @@ const Profile = () => {
         }
         // console.log(userContext.user)
         if (userContext.user) {
-            // setUser(userContext.user);
+            setUser(userContext.user);
             setLoading(false);
         }
     }, [id]);
