@@ -4,7 +4,7 @@ require('dotenv').config()
 const client = {
     id: process.env.client_id,
     secret: process.env.client_secret,
-    url:  "http://localhost:3000/oauth/login"
+    url:  process.env.redirect_url
 }
 
 
